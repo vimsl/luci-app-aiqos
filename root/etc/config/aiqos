@@ -1,0 +1,18 @@
+config aiqos 'main'
+    option enabled '1'
+    option sinr_inject '1'
+    option night_lock '0'
+    option cake_enabled '1'
+    option latency_control '0'
+    option gaming_mode '0'
+    option auto_detect '1'
+    option preset 'office'
+
+config sinr 'settings'
+    option interval '2'
+    option max_timeouts '5'
+    option backoff '15'
+
+config night_lock 'settings'
+    option watchdog_interval '30'
+    option at_port '/dev/ttyUSB1'

@@ -1,0 +1,92 @@
+<%#
+AIQoS Status Dashboard
+Part of luci-app-aiqos
+-%>
+
+<%+header%>
+
+<div id="aiqos-status">
+    <h2><%:AIQoS Status Dashboard%></h2>
+
+    <div id="sinr-card">
+        <h3><%:Signal Quality (SINR Coefficient)%></h3>
+        <div id="sinr-value">--</div>
+        <div id="sinr-bar"></div>
+    </div>
+
+    <div id="module-card">
+        <h3><%:Module Status%></h3>
+        <table>
+            <tr><td><%:Daemon Running%></td><td id="daemon-status">--</td></tr>
+            <tr><td><%:SINR Injector%></td><td id="sinr-running">--</td></tr>
+            <tr><td><%:Night Lock%></td><td id="night-running">--</td></tr>
+            <tr><td><%:CAKE Active%></td><td id="cake-status">--</td></tr>
+        </table>
+    </div>
+
+    <div id="capability-card">
+        <h3><%:Platform Capabilities%></h3>
+        <pre id="capability-json">--</pre>
+    </div>
+</div>
+
+<script>
+(function() {
+    function updateStatus() {
+        fetch('<%=luci.dispatcher.build_url("admin", "services", "aiqos", "status_json")%>')
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                // SINR coefficient
+                var sinrVal = data.sinr_coeff || '--';
+                document.getElementById('sinr-value').textContent = sinrVal + '/100';
+
+                // Daemon status
+                document.getElementById('daemon-status').textContent =
+                    data.running ? '<%:Running%>' : '<%:Stopped%>';
+
+                // Capability JSON
+                if (data.capability && data.capability !== '') {
+                    try {
+                        var cap = JSON.parse(data.capability);
+                        document.getElementById('capability-json').textContent =
+                            JSON.stringify(cap, null, 2);
+                    } catch(e) {
+                        document.getElementById('capability-json').textContent = data.capability;
+                    }
+                }
+            })
+            .catch(function() {
+                document.getElementById('daemon-status').textContent = '<%:Error%>';
+            });
+    }
+
+    updateStatus();
+    setInterval(updateStatus, 5000);
+})();
+</script>
+
+<style>
+#aiqos-status { max-width: 800px; margin: 0 auto; }
+#aiqos-status > div {
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+#sinr-value { font-size: 2em; font-weight: bold; color: #2ecc71; }
+#aiqos-status table { width: 100%; }
+#aiqos-status table td { padding: 4px 8px; }
+#aiqos-status table td:first-child { font-weight: bold; width: 40%; }
+#capability-json {
+    background: #f5f5f5;
+    padding: 10px;
+    border-radius: 3px;
+    font-family: monospace;
+    font-size: 0.85em;
+    max-height: 300px;
+    overflow-y: auto;
+}
+</style>
+
+<%+footer%>

@@ -1,0 +1,18 @@
+# DTS Patch: Enable HNAT WWAN recognition for MT7987 Hiveton H5000M
+# Adds ext-devices-prefix = "wwan" to the hnat node
+# This allows HNAT hardware acceleration to recognize wwan0 interface
+#
+# Usage:
+#   cd immortalwrt-mt798x
+#   patch -p1 < 0001-mt7987-h5000m-hnat-add-wwan-ext-devices.patch
+#
+# Or via sed (non-destructive):
+#   sed -i '/hnat {/a\\t\text-devices-prefix = "wwan";' target/linux/mediatek/dts/mt7987-hiveton-h5000m.dts
+
+--- a/target/linux/mediatek/dts/mt7987-hiveton-h5000m.dts
++++ b/target/linux/mediatek/dts/mt7987-hiveton-h5000m.dts
+@@ -XX,XX +XX,XX @@
+ 	hnat {
+ 		compatible = "mediatek,mtk-hnat";
++		ext-devices-prefix = "wwan";
+ 	};
