@@ -5,6 +5,7 @@
 # Part of luci-app-aiqos
 
 OUTPUT_FILE="/tmp/aiqos_capability.json"
+UQMI_DEVICE=$(uci -q get aiqos.settings.device || echo "/dev/cdc-wdm0")
 LOG_TAG="condition_detect"
 
 log_msg() {
@@ -33,7 +34,7 @@ detect_ebpf() {
 }
 
 detect_eqos_mtk() {
-    if which eqos-mtk >/dev/null 2>&1; then
+    if command -v eqos-mtk >/dev/null 2>&1; then
         echo '"eqos_mtk": {"installed": true}'
     elif lsmod | grep -qi "eqos"; then
         echo '"eqos_mtk": {"installed": true, "module_loaded": true}'
@@ -43,9 +44,9 @@ detect_eqos_mtk() {
 }
 
 detect_modem() {
-    if uqmi -d /dev/cdc-wdm0 --get-capabilities >/dev/null 2>&1; then
-        local model=$(uqmi -d /dev/cdc-wdm0 --get-model 2>/dev/null)
-        local fw=$(uqmi -d /dev/cdc-wdm0 --get-firmware-version 2>/dev/null)
+    if uqmi -d "$UQMI_DEVICE" --get-capabilities >/dev/null 2>&1; then
+        local model=$(uqmi -d "$UQMI_DEVICE" --get-model 2>/dev/null)
+        local fw=$(uqmi -d "$UQMI_DEVICE" --get-firmware-version 2>/dev/null)
         echo "\"modem\": {\"detected\": true, \"model\": \"${model:-unknown}\", \"firmware\": \"${fw:-unknown}\", \"interface\": \"uqmi\"}"
     elif lsusb | grep -qi "2cb7"; then
         echo '"modem": {"detected": true, "vendor": "Fibocom", "interface": "detected_but_not_ready"}'
@@ -66,7 +67,7 @@ detect_hnat() {
 detect_cake() {
     if tc qdisc show 2>/dev/null | grep -q "cake"; then
         echo '"cake": {"active": true}'
-    elif which tc >/dev/null 2>&1; then
+    elif command -v tc >/dev/null 2>&1; then
         echo '"cake": {"active": false, "available": true}'
     else
         echo '"cake": {"active": false, "available": false}'
