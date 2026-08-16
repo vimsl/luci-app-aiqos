@@ -12,6 +12,7 @@ config sinr 'settings'
     option interval '2'
     option max_timeouts '5'
     option backoff '15'
+    option device '/dev/cdc-wdm0'
 
 config night_lock 'settings'
     option watchdog_interval '30'
