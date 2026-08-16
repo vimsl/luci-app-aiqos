@@ -6,8 +6,8 @@
 
 LOG_TAG="night_lock"
 WATCHDOG_INTERVAL=30
-UQMI_DEVICE="/dev/cdc-wdm0"
-AT_PORT="/dev/ttyUSB1"
+UQMI_DEVICE=$(uci -q get aiqos.settings.device || echo "/dev/cdc-wdm0")
+AT_PORT=$(uci -q get aiqos.settings.at_port || echo "/dev/ttyUSB1")
 QMODE_PID_FILE="/var/run/qmodem.pid"
 
 log_msg() {
@@ -65,7 +65,7 @@ lock_via_at() {
 # Tier 3: Lock via mmcli (fallback)
 lock_via_mmcli() {
     local pci="$1"
-    which mmcli >/dev/null 2>&1 || return 1
+    command -v mmcli >/dev/null 2>&1 || return 1
     local modem_id=$(mmcli -L 2>/dev/null | grep -o '/org/freedesktop/ModemManager1/Modem/[0-9]*' | head -1)
     [ -n "$modem_id" ] && mmcli -m "$modem_id" --3gpp-lock-cell="$pci" 2>/dev/null && return 0
     return 1
