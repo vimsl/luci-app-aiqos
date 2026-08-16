@@ -30,11 +30,11 @@ trap 'rm -f "$LOCK_FILE"' EXIT
 timeout_count=0
 while true; do
     # Read SINR via uqmi with timeout and retry
-    result=$(timeout 3 uqmi -d /dev/cdc-wdm0 --get-signal-info 2>/dev/null)
+    result=$(timeout 3 uqmi -d "$UQMI_DEVICE" --get-signal-info 2>/dev/null)
     
     if [ -n "$result" ]; then
         # Parse signal info
-        rsrp=$(echo "$result" | grep -o '"rssi":-[0-9]*' | head -1 | cut -d: -f2)
+        rsrp=$(echo "$result" | grep -oE '"(rssi|rsrp)":\s*-?[0-9]+' | head -1 | grep -oE '-?[0-9]+')
         rsrq=$(echo "$result" | grep -o '"rsrq":-[0-9]*' | head -1 | cut -d: -f2)
         sinr=$(echo "$result" | grep -o '"sinr":[0-9]*' | head -1 | cut -d: -f2)
         
@@ -61,5 +61,5 @@ while true; do
     
     # Random jitter to avoid uqmi contention
     sleep_jitter=$(( RANDOM % 5 ))
-    sleep $(( INTERVAL + sleep_jitter - 2 ))
+    sleep_sec=$(( INTERVAL + sleep_jitter )); [ "$sleep_sec" -lt 1 ] && sleep_sec=1; sleep "$sleep_sec"
 done
