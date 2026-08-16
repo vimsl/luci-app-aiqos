@@ -23,6 +23,11 @@ o = s:option(Flag, "enabled", translate("Enable AIQoS"))
 o.default = 1
 o.rmempty = false
 
+o = s:option(Value, "device_path", translate("Modem Device Path"),
+    translate("Path to cdc-wdm device (e.g. /dev/cdc-wdm0)"))
+o.default = "/dev/cdc-wdm0"
+o.rmempty = true
+
 o = s:option(Flag, "sinr_inject", translate("SINR Injection"),
     translate("Continuously monitor 5G signal quality and adjust QoS parameters"))
 o.default = 1
