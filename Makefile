@@ -1,7 +1,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-aiqos
-PKG_VERSION:=1.0.0
+PKG_VERSION:=1.1.0
 PKG_RELEASE:=1
 
 PKG_MAINTAINER:=vimsl
@@ -14,7 +14,7 @@ define Package/luci-app-aiqos
   CATEGORY:=LuCI
   SUBMENU:=3. Applications
   TITLE:=AIQoS - Intelligent QoS for 5G CPE
-  DEPENDS:=+luci-base +kmod-sched-cake +cake-autorate +uqmi
+  DEPENDS:=+luci-base +kmod-sched-cake +uqmi
   PKGARCH:=all
 endef
 
